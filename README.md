@@ -10,7 +10,7 @@
  
 ## 🔗 Live Demo
  
-- **Frontend:** https://your-vercel-url.vercel.app
+- **Frontend:** https://financegpt-frontend.vercel.app
 - **Backend API:** https://financegpt-backend-h10j.onrender.com
 ---
  
