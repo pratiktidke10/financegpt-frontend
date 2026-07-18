@@ -18,6 +18,10 @@ const App = () => {
     setMessages([])
   }
 
+  const loadHistory = (historyMessages) => {
+    setMessages(historyMessages)
+  }
+
   if(loading){
     return(
       <div className='min-h-screen bg-base-100 flex items-center justify-center' data-theme='dark'>
@@ -33,7 +37,7 @@ const App = () => {
       <Route path='/' element={
         user ? (
           <div className='flex h-screen' data-theme='dark'>
-            <Sidebar clearChat={clearChat} />
+            <Sidebar clearChat={clearChat} onLoadHistory={loadHistory}/>
             <ChatView messages={messages} addMessage={addMessage} />
           </div>
         ) : (
