@@ -4,7 +4,7 @@ import Message from './Message'
 import TemplateCards from './TemplateCards'
 import { sendMessage } from '../utils/api'
 
-const ChatView = ({ messages, addMessage }) => {
+const ChatView = ({ messages, addMessage, conversationId }) => {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const messagesEndRef = useRef(null)
@@ -37,7 +37,8 @@ const ChatView = ({ messages, addMessage }) => {
     setLoading(true)
 
     try {
-      const response = await sendMessage(input)
+      const response = await sendMessage(input , conversationId)
+      if (!response) return
       const aiMessage = {
         id: Date.now() + 1,
         text: response,
@@ -69,9 +70,12 @@ const ChatView = ({ messages, addMessage }) => {
     <main className='flex flex-col flex-1 h-screen bg-base-100'>
 
       {/* Header */}
-      <div className='p-4 border-b border-base-300'>
-        <h2 className='text-xl font-semibold'>Financial Assistant</h2>
-        <p className='text-sm text-base-content/50'>Ask me about stocks, prices, and portfolio management</p>
+      <div className='p-4 border-b border-base-300 flex items-center gap-3'>
+        <div className='w-2 h-2 rounded-full bg-success animate-pulse'></div>
+        <div>
+          <h2 className='text-lg font-semibold'>Financial Assistant</h2>
+          <p className='text-xs text-base-content/40'>Powered by Gemini AI + Alpha Vantage</p>
+        </div>
       </div>
 
       {/* Messages */}
@@ -85,41 +89,50 @@ const ChatView = ({ messages, addMessage }) => {
         )}
 
         {loading && (
-          <div className='flex gap-3 items-start'>
-            <div className='avatar placeholder'>
-              <div className='w-8 rounded-full bg-primary text-primary-content'>
-                <span className='text-xs'>AI</span>
-              </div>
-            </div>
-            <div className='chat-bubble bg-base-200'>
-              <span className='loading loading-dots loading-sm'></span>
+        <div className='flex gap-3 items-start'>
+          <div className='flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center'>
+            <span className='loading loading-spinner loading-xs text-primary'></span>
+          </div>
+          <div className='bg-base-200 border border-base-300 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[200px]'>
+            <div className='flex flex-col gap-2'>
+              <div className='h-2 bg-base-300 rounded animate-pulse w-32'></div>
+              <div className='h-2 bg-base-300 rounded animate-pulse w-24'></div>
+              <div className='h-2 bg-base-300 rounded animate-pulse w-28'></div>
             </div>
           </div>
+        </div>
         )}
 
         <div ref={messagesEndRef} />
       </section>
 
       {/* Input */}
-      <div className='p-4 border-t border-base-300'>
-        <div className='flex gap-2 items-end'>
-          <textarea
-            ref={inputRef}
-            className='textarea textarea-bordered flex-1 resize-none min-h-[48px] max-h-[120px]'
-            placeholder='Ask about stocks, buy/sell shares, view portfolio...'
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            rows={1}
-          />
+      <div className='p-4 border-t border-base-300 bg-base-100'>
+        <div className='flex gap-2 items-end max-w-3xl mx-auto'>
+          <div className='relative flex-1'>
+            <textarea
+              ref={inputRef}
+              className='w-full bg-base-200 border border-base-300 focus:border-primary/50 focus:outline-none rounded-xl px-4 py-3 text-sm resize-none min-h-[48px] max-h-[120px] text-base-content placeholder:text-base-content/30 transition-colors'
+              placeholder='Ask about stocks, buy/sell shares, view portfolio...'
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              rows={1}
+            />
+          </div>
           <button
-            className='btn btn-primary btn-square'
+            className='btn btn-primary btn-square rounded-xl'
             onClick={handleSend}
             disabled={!input.trim() || loading}>
-            <MdSend size={20} />
+            {loading
+              ? <span className='loading loading-spinner loading-sm'></span>
+              : <MdSend size={18} />
+            }
           </button>
         </div>
-        <p className='text-xs text-base-content/30 mt-1'>Press Enter to send, Shift+Enter for new line</p>
+        <p className='text-xs text-base-content/30 mt-2 text-center'>
+          Press Enter to send · Shift+Enter for new line
+        </p>
       </div>
     </main>
   )

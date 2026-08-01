@@ -1,5 +1,6 @@
 import ReactMarkdown from 'react-markdown'
-import { MdComputer, MdPerson } from 'react-icons/md'
+import { MdPerson } from 'react-icons/md'
+import { RiRobot2Line } from 'react-icons/ri'
 
 const Message = ({ message }) => {
   const { text, ai, createdAt } = message
@@ -12,24 +13,30 @@ const Message = ({ message }) => {
   }
 
   return (
-    <div className={`flex gap-3 items-start ${ai ? '' : 'flex-row-reverse'}`}>
-      
+    <div className={`flex gap-3 items-start animate-fade-in ${ai ? '' : 'flex-row-reverse'}`}>
+
       {/* Avatar */}
-      <div className='avatar placeholder flex-shrink-0'>
-        <div className={`w-8 rounded-full ${ai ? 'bg-primary text-primary-content' : 'bg-secondary text-secondary-content'}`}>
-          {ai ? <MdComputer size={16} /> : <MdPerson size={16} />}
-        </div>
+      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${ai ? 'bg-primary/20 border border-primary/30' : 'bg-secondary/20 border border-secondary/30'}`}>
+        {ai
+          ? <RiRobot2Line size={16} className='text-primary' />
+          : <MdPerson size={16} className='text-secondary' />
+        }
       </div>
 
-      {/* Bubble */}
-      <div className={`max-w-[75%] ${ai ? '' : 'items-end flex flex-col'}`}>
-        <div className={`rounded-2xl px-4 py-3 ${ai ? 'bg-base-200 text-base-content' : 'bg-primary text-primary-content'}`}>
+      {/* Content */}
+      <div className={`flex flex-col max-w-[75%] ${ai ? 'items-start' : 'items-end'}`}>
+        <div className={`rounded-2xl px-4 py-3 ${
+          ai
+            ? 'bg-base-200 border border-base-300 text-base-content rounded-tl-sm'
+            : 'bg-primary text-primary-content rounded-tr-sm'
+        }`}>
           <ReactMarkdown
             components={{
-              p: ({ children }) => <p className='text-sm leading-relaxed whitespace-pre-wrap'>{children}</p>,
-              ul: ({ children }) => <ul className='list-disc list-inside text-sm space-y-1 mt-1'>{children}</ul>,
+              p: ({ children }) => <p className='text-sm leading-relaxed whitespace-pre-wrap m-0'>{children}</p>,
+              ul: ({ children }) => <ul className='list-disc list-inside text-sm space-y-1 mt-2'>{children}</ul>,
               li: ({ children }) => <li className='text-sm'>{children}</li>,
               strong: ({ children }) => <strong className='font-semibold'>{children}</strong>,
+              h3: ({ children }) => <h3 className='font-semibold text-sm mb-2'>{children}</h3>,
             }}>
             {text}
           </ReactMarkdown>

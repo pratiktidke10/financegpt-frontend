@@ -1,63 +1,80 @@
 const templates = [
   {
-    title: 'Current Stock Price',
+    title: 'Stock Price',
     prompt: 'What is the current price of Apple?',
-    icon: '📈'
+    icon: '📈',
+    desc: 'Get real-time stock prices'
   },
   {
-    title: 'Stock Performance',
+    title: 'Performance',
     prompt: 'How has Tesla performed recently?',
-    icon: '📊'
+    icon: '📊',
+    desc: 'Analyze weekly performance'
   },
   {
     title: 'Compare Stocks',
     prompt: 'Compare Apple and Google stocks',
-    icon: '🔀'
+    icon: '🔀',
+    desc: 'Side by side comparison'
   },
   {
     title: 'Buy Stocks',
     prompt: 'Buy 5 shares of Apple',
-    icon: '🛒'
+    icon: '🛒',
+    desc: 'Add to virtual portfolio'
   },
   {
     title: 'Sell Stocks',
     prompt: 'Sell 2 shares of Apple',
-    icon: '💰'
+    icon: '💰',
+    desc: 'Manage your holdings'
   },
   {
-    title: 'View Portfolio',
+    title: 'My Portfolio',
     prompt: 'Show my portfolio',
-    icon: '💼'
+    icon: '💼',
+    desc: 'View your investments'
   },
 ]
 
 const TemplateCards = ({ onSelect }) => {
   return (
-    <div className='flex flex-col items-center justify-center h-full gap-8 py-8'>
-      
-      {/* Welcome */}
-      <div className='text-center'>
-        <h2 className='text-3xl font-bold text-primary mb-2'>Welcome to FinanceGPT</h2>
-        <p className='text-base-content/60'>Your AI-powered financial assistant</p>
+    <div className='flex flex-col items-center justify-center h-full gap-10 py-8'>
+
+      {/* Hero */}
+      <div className='text-center space-y-3'>
+        <div className='inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-2'>
+          <span className='text-primary text-xs font-medium tracking-wide uppercase'>AI Powered</span>
+        </div>
+        <h1 className='text-4xl font-bold'>
+          <span className='text-base-content'>Welcome to </span>
+          <span className='text-primary'>FinanceGPT</span>
+        </h1>
+        <p className='text-base-content/50 text-sm max-w-md mx-auto'>
+          Your intelligent financial assistant. Ask anything about stocks, manage your portfolio, and get real-time market insights.
+        </p>
       </div>
 
       {/* Cards */}
-      <div className='grid grid-cols-2 gap-3 w-full max-w-2xl'>
+      <div className='grid grid-cols-3 gap-3 w-full max-w-2xl'>
         {templates.map((template, index) => (
           <button
             key={index}
             onClick={() => onSelect(template.prompt)}
-            className='p-4 border border-base-300 rounded-xl hover:border-primary hover:bg-base-200 transition-all duration-200 text-left group'>
-            <div className='flex items-center gap-2 mb-1'>
-              <span className='text-xl'>{template.icon}</span>
-              <p className='font-semibold text-sm group-hover:text-primary transition-colors'>
-                {template.title}
-              </p>
-            </div>
-            <p className='text-xs text-base-content/50'>{template.prompt}</p>
+            className='group p-4 border border-base-300 rounded-xl hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 text-left'>
+            <span className='text-2xl mb-2 block'>{template.icon}</span>
+            <p className='font-semibold text-sm text-base-content group-hover:text-primary transition-colors'>
+              {template.title}
+            </p>
+            <p className='text-xs text-base-content/40 mt-0.5'>{template.desc}</p>
           </button>
         ))}
       </div>
+
+      {/* Bottom hint */}
+      <p className='text-xs text-base-content/30'>
+        Powered by Gemini AI + Alpha Vantage
+      </p>
     </div>
   )
 }

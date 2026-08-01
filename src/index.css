@@ -1,2 +1,31 @@
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: false;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+}
+
+[data-theme="financegpt"] {
+  --color-base-100: #0f0f1a;
+  --color-base-200: #16162a;
+  --color-base-300: #1e1e35;
+  --color-base-content: #e2e8f0;
+  --color-primary: #8b5cf6;
+  --color-primary-content: #ffffff;
+  --color-secondary: #6d28d9;
+  --color-secondary-content: #ffffff;
+  --color-accent: #a78bfa;
+  --color-accent-content: #ffffff;
+  --color-neutral: #1e1e35;
+  --color-neutral-content: #e2e8f0;
+  --color-info: #38bdf8;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+  --rounded-box: 0.75rem;
+  --rounded-btn: 0.5rem;
+}
