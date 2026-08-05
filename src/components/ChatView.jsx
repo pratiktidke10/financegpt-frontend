@@ -34,11 +34,14 @@ const ChatView = ({ messages, addMessage, conversationId }) => {
     const textToSend = customPrompt || input
     if (!textToSend.trim() || loading) return
 
+    // 1. Create ISO Timestamp string for uniform local time parsing
+    const currentIsoTime = new Date().toISOString()
+
     const userMessage = {
-      id: Date.now(),
+      id: `user-${Date.now()}`,
       text: textToSend,
       ai: false,
-      createdAt: Date.now()
+      createdAt: currentIsoTime
     }
 
     addMessage(userMessage)
@@ -51,24 +54,25 @@ const ChatView = ({ messages, addMessage, conversationId }) => {
     try {
       const response = await sendMessage(textToSend, conversationId)
       if (!response) return
+
       const aiMessage = {
-        id: Date.now() + 1,
+        id: `ai-${Date.now()}`,
         text: response,
         ai: true,
-        createdAt: Date.now()
+        createdAt: new Date().toISOString()
       }
       addMessage(aiMessage)
     } catch (error) {
       const errorMessage = {
-        id: Date.now() + 1,
+        id: `err-${Date.now()}`,
         text: 'Sorry, something went wrong. Please try again.',
         ai: true,
-        createdAt: Date.now()
+        createdAt: new Date().toISOString()
       }
       addMessage(errorMessage)
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   const handleKeyDown = (e) => {
@@ -102,7 +106,7 @@ const ChatView = ({ messages, addMessage, conversationId }) => {
           <TemplateCards onSelect={handleTemplateSelect} />
         ) : (
           messages.map(message => (
-            <Message key={message.id} message={message} />
+            <Message key={message.id || message.createdAt} message={message} />
           ))
         )}
 

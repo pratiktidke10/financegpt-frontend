@@ -8,31 +8,44 @@ import PortfolioChart from './PortfolioChart'
 const Message = ({ message }) => {
   const { text, ai, createdAt } = message
 
+  // ✅ Fixed formatTime function handles ISO, local strings, and numeric epochs cleanly
   const formatTime = (timestamp) => {
-    return new Date(timestamp).toLocaleTimeString([], {
+    if (!timestamp) return ''
+    
+    // If backend returns a UTC ISO string missing 'Z', append 'Z' so JS knows it's UTC
+    let dateInput = timestamp
+    if (typeof timestamp === 'string' && !timestamp.endsWith('Z') && timestamp.includes('T')) {
+      dateInput = `${timestamp}Z`
+    }
+
+    const date = new Date(dateInput)
+    if (isNaN(date.getTime())) return ''
+
+    return date.toLocaleTimeString([], {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      hour12: true
     })
   }
 
   let singleChartData = null
   let multiChartData = null
   let portfolioChartData = null
-  let displayText = text
+  let displayText = text || ''
 
-  if(ai && text){
-    //Single Stock Chart
+  if (ai && text) {
+    // Single Stock Chart
     const singleMatch = text.match(/```json\s*(\{[\s\S]*?"type":\s*"STOCK_CHART"[\s\S]*?\})\s*```/)
-    if(singleMatch){
-      try{
+    if (singleMatch) {
+      try {
         singleChartData = JSON.parse(singleMatch[1])
-        displayText = text.replace(singleMatch[0],'').trim()
-      }catch(e){
-        console.error('Failed to parse single chart JSON: ' , e)
+        displayText = text.replace(singleMatch[0], '').trim()
+      } catch (e) {
+        console.error('Failed to parse single chart JSON:', e)
       }
     }
 
-    //Multi-Stock comparison chart
+    // Multi-Stock comparison chart
     const multiMatch = text.match(/```json\s*(\{[\s\S]*?"type":\s*"MULTI_STOCK_CHART"[\s\S]*?\})\s*```/)
     if (multiMatch) {
       try {
@@ -43,14 +56,14 @@ const Message = ({ message }) => {
       }
     }
 
-    //Portfolio Asset allocation chart
+    // Portfolio Asset allocation chart
     const portfolioMatch = text.match(/```json\s*(\{[\s\S]*?"type":\s*"PORTFOLIO_CHART"[\s\S]*?\})\s*```/)
-    if(portfolioMatch){
+    if (portfolioMatch) {
       try {
         portfolioChartData = JSON.parse(portfolioMatch[1])
-        displayText = text.replace(portfolioMatch[0],'').trim()
+        displayText = text.replace(portfolioMatch[0], '').trim()
       } catch (e) {
-        console.error('Failed to parse portfolio JSON: ', e)
+        console.error('Failed to parse portfolio JSON:', e)
       }
     }
   }
@@ -92,9 +105,12 @@ const Message = ({ message }) => {
             {displayText}
           </ReactMarkdown>
         </div>
-        <span className='text-xs text-base-content/30 mt-1 px-1'>
-          {formatTime(createdAt)}
-        </span>
+        
+        {createdAt && (
+          <span className='text-[10px] text-base-content/40 mt-1 px-1'>
+            {formatTime(createdAt)}
+          </span>
+        )}
       </div>
     </div>
   )
