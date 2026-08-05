@@ -1,4 +1,4 @@
-import { Children, createContext, useContext, useState , useEffect} from "react";
+import { createContext, useContext, useState, useEffect } from "react"
 
 const AuthContext = createContext(null)
 
@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // On app load, check if user is already logged in
+    // Check local storage for persistent authentication session
     const storedToken = localStorage.getItem('token')
     const storedUser = localStorage.getItem('username')
 
@@ -36,7 +36,13 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ user, token, login, logout, loading }}>
-      {children}
+      {!loading ? (
+        children
+      ) : (
+        <div className="h-screen w-screen bg-base-100 flex items-center justify-center">
+          <span className="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+      )}
     </AuthContext.Provider>
   )
 }

@@ -1,98 +1,105 @@
-
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080'
 
-export const sendMessage = async (message , conversationId) => {
+const getHeaders = () => {
   const token = localStorage.getItem('token')
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': token ? `Bearer ${token}` : ''
+  }
+}
 
-  const response = await fetch(`${BASE_URL}/api/chat`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify({ message, conversationId })
-  })
-
-
-  if (response.status === 403) {
+const handleUnauthorized = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('username')
-  window.location.href = '/login'
-  return
-}
-
-  if (!response.ok) {
-    throw new Error('Failed to send message')
+  if (window.location.pathname !== '/login') {
+    window.location.href = '/login'
   }
-
- const data = await response.json()
- return data.response
 }
 
+export const sendMessage = async (message, conversationId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/chat`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ message, conversationId })
+    })
+
+    // FIXED: Removed invalid negation (!) operator
+    if (response.status === 401) {
+      handleUnauthorized()
+      return null
+    }
+
+    if (!response.ok) {
+      throw new Error(`Server returned status: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.response
+  } catch (error) {
+    console.error('sendMessage failed:', error)
+    throw error
+  }
+}
 
 export const fetchHistory = async () => {
-  const token = localStorage.getItem('token')
+  try {
+    const response = await fetch(`${BASE_URL}/api/history`, {
+      method: 'GET',
+      headers: getHeaders()
+    })
 
-  const response = await fetch(`${BASE_URL}/api/history`,{
-    method : 'GET',
-    headers : {
-      'Authorization' : `Bearer ${token}`
+    if (response.status === 401) {
+      handleUnauthorized()
+      return []
     }
-  })
 
-  if (response.status === 403) {
-  localStorage.removeItem('token')
-  localStorage.removeItem('username')
-  window.location.href = '/login'
-  return
+    if (!response.ok) return []
+    return await response.json()
+  } catch (e) {
+    console.error('History fetch failed silently:', e)
+    return []
+  }
 }
 
-  if(!response.ok){
-    throw new Error('Failed to fetch the history')
-  }
+export const fetchConversationDetails = async (conversationId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/history/${conversationId}`, {
+      method: 'GET',
+      headers: getHeaders()
+    })
 
-  const data = await response.json()
-  return data 
+    if (response.status === 401) {
+      handleUnauthorized()
+      return []
+    }
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch conversation details')
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error('fetchConversationDetails failed:', error)
+    throw error
+  }
 }
 
+export const deleteConversation = async (conversationId) => {
+  try {
+    const response = await fetch(`${BASE_URL}/api/history/${conversationId}`, {
+      method: 'DELETE',
+      headers: getHeaders()
+    })
 
-export const fetchConversationDetails = async(conversationId) => {
-  const token = localStorage.getItem('token')
-
-  const response = await fetch(`${BASE_URL}/api/history/${conversationId}`,{
-    method : 'GET',
-    headers : {
-      'Authorization' : `Bearer ${token}`
+    if (response.status === 401) {
+      handleUnauthorized()
+      return false
     }
-  })
 
-  if(response.status === 403){
-    localStorage.removeItem('token')
-    localStorage.removeItem('username')
-    window.location.href = '/login'
-    return
+    return response.ok
+  } catch (error) {
+    console.error('deleteConversation failed:', error)
+    return false
   }
-
-  if(!response.ok){
-    throw new Error('Failed to fetch conversation details')
-  }
-
-  return await response.json()
-}
-
-export const deleteConversation = async(conversationId) => {
-  const token = localStorage.getItem('token')
-
-  const response = await fetch(`${BASE_URL}/api/history/${conversationId}` , {
-    method : 'DELETE',
-    headers : {
-      'Authorization' : `Bearer ${token}`
-    }
-  })
-
-  if(!response.ok){
-    throw new Error('Failed to delete conversation')
-  }
-
-  return true
 }
