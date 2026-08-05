@@ -24,7 +24,6 @@ export const sendMessage = async (message, conversationId) => {
       body: JSON.stringify({ message, conversationId })
     })
 
-    // FIXED: Removed invalid negation (!) operator
     if (response.status === 401) {
       handleUnauthorized()
       return null
